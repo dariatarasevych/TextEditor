@@ -7,4 +7,6 @@ add_executable(assignment_4 main.cpp
         Line.h
         TextEditor.cpp
         TextEditor.h
+        Cipher.cpp
+        Cipher.h
 )
