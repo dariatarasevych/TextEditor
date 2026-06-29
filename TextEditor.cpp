@@ -384,3 +384,39 @@ void TextEditor::loadFromFile(const std::string &fileName) {
     inFile.close();
     deserializeAll(fileContent);
 }
+
+void TextEditor::saveToFileEncrypted(const std::string &fileName, Cipher *cipher) {
+    std::ofstream outFile(fileName);
+
+    if (!outFile.is_open()) {
+        std::cout << "Error! Cannot open file to save: " << fileName << std::endl;
+        return;
+    }
+
+    std::string encrypted = cipher -> encrypt(serializeAll());
+
+    outFile << encrypted;
+
+    outFile.close();
+}
+
+void TextEditor::loadFromFileDecrypted(const std::string &fileName, Cipher *cipher) {
+    std::ifstream inFile(fileName);
+
+    if (!inFile.is_open()) {
+        std::cout << "Error! Cannot open file to load: " << fileName << std::endl;
+        return;
+    }
+
+    clearLines();
+
+    std::stringstream buffer;
+    buffer << inFile.rdbuf();
+    std::string fileContent = buffer.str();
+
+    std::string decrypted = cipher -> decrypt(fileContent);
+
+    inFile.close();
+
+    deserializeAll(decrypted);
+}

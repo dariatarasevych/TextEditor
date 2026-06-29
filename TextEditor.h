@@ -2,6 +2,7 @@
 #define ASSIGNMENT_4_TEXTEDITOR_H
 
 #include "Line.h"
+#include "Cipher.h"
 #include <stack>
 
 class TextEditor {
@@ -43,6 +44,9 @@ public:
 
     void saveToFile(const std::string& fileName);
     void loadFromFile(const std::string& fileName);
+
+    void saveToFileEncrypted(const std::string & fileName, Cipher* cipher);
+    void loadFromFileDecrypted(const std::string& fileName, Cipher* cipher);
 };
 
 #endif //ASSIGNMENT_4_TEXTEDITOR_H
