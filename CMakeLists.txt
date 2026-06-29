@@ -9,4 +9,6 @@ add_executable(assignment_4 main.cpp
         TextEditor.h
         Cipher.cpp
         Cipher.h
+        CLI.cpp
+        CLI.h
 )

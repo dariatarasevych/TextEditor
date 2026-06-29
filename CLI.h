@@ -5,10 +5,10 @@
 
 class CLI {
 private:
-    TextEditor& text_editor;
+    TextEditor& editor;
     void printMenu() const;
 public:
-    CLI(TextEditor& text_editor);
+    CLI(TextEditor& textEditor);
     void Run();
 };
 
