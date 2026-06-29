@@ -4,4 +4,7 @@ project(assignment_4)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(assignment_4 main.cpp
-        Line.h)
+        Line.h
+        TextEditor.cpp
+        TextEditor.h
+)
