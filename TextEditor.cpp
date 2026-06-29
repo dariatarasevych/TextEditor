@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 TextEditor::TextEditor() {
     lines = nullptr;
@@ -268,3 +269,118 @@ void TextEditor::cutText(int lineIndex, int charIndex, int count) {
     deleteText(lineIndex, charIndex, count);
 }
 
+std::string TextEditor::serializeAll() const {
+    std::string result = "";
+
+    for (int i = 0; i < line_counter; i++) {
+        result += lines[i] ->serialize() + '\n';
+    }
+    return result;
+}
+
+void TextEditor::deserializeAll(const std::string &sourceText) {
+    std::stringstream sT(sourceText);
+    std::string tempLine;
+
+    while (std::getline(sT, tempLine)) {
+        if (tempLine[0] == 'T') {
+            std::string pureText = tempLine.substr(2);
+            Line* newLine = new TextLine(pureText);
+            appendLine(newLine);
+        }
+
+        else if (tempLine[0] == 'C') {
+            std::string body = tempLine.substr(2);
+            bool is_checked = (body[0] == '1');
+            std::string bodyTaskText = body.substr(2);
+            Line* newLine = new CheckListLine(bodyTaskText, is_checked);
+            appendLine(newLine);
+        }
+
+        else if (tempLine[0] == 'I') {
+            std::string body = tempLine.substr(2);
+            std::stringstream contactStream(body);
+            std::string firstName, lastName, email;
+
+            std::getline(contactStream, firstName, ':');
+            std::getline(contactStream, lastName, ':');
+            std::getline(contactStream, email);
+
+            Line* newLine = new ContactLine(firstName, lastName, email);
+            appendLine(newLine);
+        }
+    }
+}
+
+void TextEditor::saveSnapshot() {
+    std::string currentText = serializeAll();
+    undo_stack.push(currentText);
+    redo_stack = std::stack<std::string>();
+}
+
+void TextEditor::undo() {
+    if (undo_stack.empty()) {
+        std::cout << "Nothing to undo." << std::endl;
+        return;
+    }
+
+    redo_stack.push(serializeAll());
+
+    std::string oldState = undo_stack.top();
+    undo_stack.pop();
+
+    clearLines();
+
+    deserializeAll(oldState);
+
+    std::cout << "Undo successfully!" << std::endl;
+}
+
+void TextEditor::redo() {
+    if (redo_stack.empty()) {
+        std::cout << "Nothing to redo." << std::endl;
+        return;
+    }
+
+    undo_stack.push(serializeAll());
+
+    std::string oldState = redo_stack.top();
+    redo_stack.pop();
+
+    clearLines();
+
+    deserializeAll(oldState);
+
+    std::cout << "Redo successfully!" << std::endl;
+}
+
+void TextEditor::saveToFile(const std::string &fileName) {
+    std::ofstream outFile(fileName);
+
+    if (!outFile.is_open()) {
+        std::cout << "Error! Cannot open file to save: " << fileName << std::endl;
+        return;
+    }
+
+    outFile << serializeAll();
+
+    outFile.close();
+}
+
+void TextEditor::loadFromFile(const std::string &fileName) {
+    std::ifstream inFile(fileName);
+
+    if (!inFile.is_open()) {
+        std::cout << "Error! Cannot open file to load: " << fileName << std::endl;
+        return;
+    }
+
+    clearLines();
+
+    std::stringstream buffer;
+    buffer << inFile.rdbuf();
+    std::string fileContent = buffer.str();
+
+    inFile.close();
+    deserializeAll(fileContent);
+}

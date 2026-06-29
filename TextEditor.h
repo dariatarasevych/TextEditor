@@ -40,6 +40,9 @@ public:
 
     std::string serializeAll() const;
     void deserializeAll(const std::string& sourceText);
+
+    void saveToFile(const std::string& fileName);
+    void loadFromFile(const std::string& fileName);
 };
 
 #endif //ASSIGNMENT_4_TEXTEDITOR_H
