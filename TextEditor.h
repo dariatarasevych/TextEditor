@@ -33,7 +33,7 @@ public:
     //clipboard
     void copyText(int lineIndex, int charIndex, int count);
     void pasteText(int lineIndex, int charIndex);
-    void  cutText(int lineIndex, int charIndex, int count);
+    void cutText(int lineIndex, int charIndex, int count);
 
     void undo();
     void redo();
