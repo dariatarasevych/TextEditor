@@ -17,6 +17,7 @@ private:
 
     void saveSnapshot();
     void clearLines();
+    void appendLineWithoutSnapshot(Line *newLine);
 
 public:
     TextEditor();

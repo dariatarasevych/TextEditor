@@ -1,6 +1,7 @@
 #include "CLI.h"
 #include <iostream>
 #include <string>
+#include <limits>
 
 CLI::CLI(TextEditor &text_editor) : editor(text_editor) {}
 
@@ -34,9 +35,18 @@ void CLI::Run() {
         printMenu();
         std::cin >> choice;
 
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Invalid input.\n";
+            continue;
+        }
+
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
         switch (choice) {
             case 1: {
-                std::cout << "Current text: \n" << std::endl;
+                std::cout << "Current text:" << std::endl;
                 editor.printAll();
                 break;
             }
@@ -45,31 +55,28 @@ void CLI::Run() {
                 std::cout << "Enter line type (1 - Text Line, 2 - Check List Line, 3 - Contact Line): ";
                 int type;
                 std::cin >> type;
-                std::cin.ignore();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
                 if (type == 1) {
                     std::cout << "Enter text: ";
                     std::string text;
-                    std::cin >> text;
                     std::getline(std::cin, text);
 
                     editor.appendLine(new TextLine(text));
-
                     std::cout << "Text Line added.\n";
                 }
 
                 else if (type == 2) {
                     std::cout << "Enter text: ";
                     std::string text;
-                    std::cin >> text;
                     std::getline(std::cin, text);
 
                     std::cout << "Is it checked? (1 - yes, 0 - no): ";
                     bool is_checked;
                     std::cin >> is_checked;
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
                     editor.appendLine(new CheckListLine(text, is_checked));
-
                     std::cout << "Check List Line added.\n";
                 }
 
@@ -83,23 +90,17 @@ void CLI::Run() {
                     std::getline(std::cin, email);
 
                     editor.appendLine(new ContactLine(firstName, lastName, email));
-
                     std::cout << "Contact Line added.\n";
                 }
                 break;
             }
 
             case 3: {
-                std::cin.ignore();
                 std::cout << "Enter text to append to the last line: ";
                 std::string text;
-                std::cin >> text;
                 std::getline(std::cin, text);
 
                 editor.appendTextToLastLine(text);
-
-                std::cout << "Text added to the last line.\n";
-
                 break;
             }
 
@@ -110,13 +111,11 @@ void CLI::Run() {
                 std::cin >> lineIndex;
                 std::cout << "Enter char index: ";
                 std::cin >> charIndex;
-                std::cin.ignore();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 std::cout << "Enter text to insert: ";
                 std::getline(std::cin, text);
 
                 editor.insertText(lineIndex, charIndex, text);
-
-                std::cout << "Inserted.\n";
                 break;
             }
 
@@ -127,12 +126,11 @@ void CLI::Run() {
                 std::cin >> lineIndex;
                 std::cout << "Enter char index: ";
                 std::cin >> charIndex;
-                std::cin.ignore();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 std::cout << "Enter text to replace: ";
                 std::getline(std::cin, text);
 
                 editor.insertWithReplacement(lineIndex, charIndex, text);
-                std::cout << "Replaced.\n";
                 break;
             }
 
@@ -146,7 +144,6 @@ void CLI::Run() {
                 std::cin >> count;
 
                 editor.deleteText(lineIndex, charIndex, count);
-                std::cout << "Deleted.\n";
                 break;
             }
 
@@ -188,7 +185,6 @@ void CLI::Run() {
             }
 
             case 10: {
-                std::cin.ignore();
                 std::cout << "Enter text to search: ";
                 std::string text;
                 std::getline(std::cin, text);
@@ -208,27 +204,26 @@ void CLI::Run() {
             }
 
             case 13: {
-                std::cin.ignore();
                 std::string fileName;
                 std::cout << "Enter file name to save to: ";
                 std::getline(std::cin, fileName);
 
                 editor.saveToFile(fileName);
+                std::cout << "Saved successfully.\n";
                 break;
             }
 
             case 14: {
-                std::cin.ignore();
                 std::string fileName;
                 std::cout << "Enter file name to load from: ";
                 std::getline(std::cin, fileName);
 
                 editor.loadFromFile(fileName);
+                std::cout << "Load successfully.\n";
                 break;
             }
 
             case 15: {
-                std::cin.ignore();
                 std::string fileName;
                 std::cout << "Enter file name to save (encrypted): ";
                 std::getline(std::cin, fileName);
@@ -236,6 +231,7 @@ void CLI::Run() {
                 std::cout << "Enter cipher type (1 - Caesar, 2 - Vigenere): ";
                 int type;
                 std::cin >> type;
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
                 Cipher* cipher = nullptr;
 
@@ -272,7 +268,7 @@ void CLI::Run() {
                 std::cout << "Enter cipher type (1 - Caesar, 2 - Vigenere): ";
                 int type;
                 std::cin >> type;
-
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 Cipher* cipher = nullptr;
 
                 if (type == 1) {
@@ -300,6 +296,15 @@ void CLI::Run() {
                 }
                 break;
             }
+
+            case 0: {
+                std::cout << "Exiting TextEditor. Goodbye!\n";
+                return;
+            }
+
+            default:
+                std::cout << "Unknown command. Try again.\n";
+                break;
         }
     }
 }

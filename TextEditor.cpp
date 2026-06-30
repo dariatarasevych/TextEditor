@@ -8,8 +8,6 @@ TextEditor::TextEditor() {
     lines = nullptr;
     line_counter = 0;
     clipboard = "";
-
-    appendLine(new TextLine(""));
 }
 TextEditor::~TextEditor() {
     clearLines();
@@ -27,9 +25,7 @@ void TextEditor::clearLines() {
 }
 
 //Add new object (TextLine, ChecklistLine or ContactLine)
-void TextEditor::appendLine(Line *newLine) {
-    saveSnapshot();
-
+void TextEditor::appendLineWithoutSnapshot(Line *newLine) {
     line_counter++;
 
     Line** temp_lines = (Line**) realloc(lines, (line_counter) * sizeof(Line*));
@@ -41,6 +37,11 @@ void TextEditor::appendLine(Line *newLine) {
     }
     lines = temp_lines;
     lines[line_counter - 1] = newLine;
+}
+
+void TextEditor::appendLine(Line *newLine) {
+    saveSnapshot();
+    appendLineWithoutSnapshot(newLine);
 }
 
 //Print whole text
@@ -56,8 +57,6 @@ void TextEditor::printAll() const {
 }
 
 void TextEditor::appendTextToLastLine(const std::string &text) {
-    saveSnapshot();
-
     if (line_counter == 0) {
         std::cout << "Text is empty." << std::endl;
         return;
@@ -67,6 +66,7 @@ void TextEditor::appendTextToLastLine(const std::string &text) {
     TextLine* textLine = dynamic_cast<TextLine *>( last_line); //check if line type is TextLine
 
     if (textLine != nullptr) {
+        saveSnapshot();
         std::string current_text = textLine -> getText();
         textLine -> setText(current_text + text);
     } else {
@@ -123,15 +123,13 @@ void TextEditor::insertText(int lineIndex, int charIndex, const std::string &tex
         return;
     }
 
+    saveSnapshot();
     s.insert(charIndex, text);
-
     textLine -> setText(s);
     std::cout << "Text inserted!" << std::endl;
 }
 
 void TextEditor::insertWithReplacement(int lineIndex, int charIndex, const std::string &text) {
-    saveSnapshot();
-
     if (lineIndex < 0 || lineIndex >= line_counter) {
         std::cout << "Invalid line index." << std::endl;
         return;
@@ -158,16 +156,13 @@ void TextEditor::insertWithReplacement(int lineIndex, int charIndex, const std::
         countToReplace = s.length() - charIndex;
     }
 
+    saveSnapshot();
     s.replace(charIndex, countToReplace, text);
-
     textLine -> setText(s);
-
     std::cout << "Text inserted with replacement!" << std::endl;
 }
 
 void TextEditor::deleteText(int lineIndex, int charIndex, int count) {
-    saveSnapshot();
-
     if (lineIndex < 0 || lineIndex >= line_counter) {
         std::cout << "Invalid line index." << std::endl;
         return;
@@ -197,10 +192,9 @@ void TextEditor::deleteText(int lineIndex, int charIndex, int count) {
         count = s.length() - charIndex;
     }
 
+    saveSnapshot();
     s.erase(charIndex, count);
-
     textLine -> setText(s);
-
     std::cout << "Deleted successfully!" << std::endl;
 }
 
@@ -235,9 +229,6 @@ void TextEditor::copyText(int lineIndex, int charIndex, int count) {
     }
 
     clipboard = s.substr(charIndex, count); //substr() бере копію шматка довжиною count, починаючи з charIndex
-
-    textLine -> setText(s);
-
     std::cout << "Copied successfully!" << std::endl;
 }
 
@@ -267,10 +258,9 @@ void TextEditor::pasteText(int lineIndex, int charIndex) {
         return;
     }
 
+    saveSnapshot();
     s.insert(charIndex, clipboard);
-
     textLine ->setText(s);
-
     std::cout << "Pasted successfully!" << std::endl;
 }
 
@@ -296,7 +286,7 @@ void TextEditor::deserializeAll(const std::string &sourceText) {
         if (tempLine[0] == 'T') {
             std::string pureText = tempLine.substr(2);
             Line* newLine = new TextLine(pureText);
-            appendLine(newLine);
+            appendLineWithoutSnapshot(newLine);
         }
 
         else if (tempLine[0] == 'C') {
@@ -304,7 +294,7 @@ void TextEditor::deserializeAll(const std::string &sourceText) {
             bool is_checked = (body[0] == '1');
             std::string bodyTaskText = body.substr(2);
             Line* newLine = new CheckListLine(bodyTaskText, is_checked);
-            appendLine(newLine);
+            appendLineWithoutSnapshot(newLine);
         }
 
         else if (tempLine[0] == 'I') {
@@ -317,7 +307,7 @@ void TextEditor::deserializeAll(const std::string &sourceText) {
             std::getline(contactStream, email);
 
             Line* newLine = new ContactLine(firstName, lastName, email);
-            appendLine(newLine);
+            appendLineWithoutSnapshot(newLine);
         }
     }
 }
@@ -340,7 +330,6 @@ void TextEditor::undo() {
     undo_stack.pop();
 
     clearLines();
-
     deserializeAll(oldState);
 
     std::cout << "Undo successfully!" << std::endl;
@@ -358,7 +347,6 @@ void TextEditor::redo() {
     redo_stack.pop();
 
     clearLines();
-
     deserializeAll(oldState);
 
     std::cout << "Redo successfully!" << std::endl;
@@ -373,7 +361,6 @@ void TextEditor::saveToFile(const std::string &fileName) {
     }
 
     outFile << serializeAll();
-
     outFile.close();
 }
 
@@ -404,9 +391,7 @@ void TextEditor::saveToFileEncrypted(const std::string &fileName, Cipher *cipher
     }
 
     std::string encrypted = cipher -> encrypt(serializeAll());
-
     outFile << encrypted;
-
     outFile.close();
 }
 
@@ -425,8 +410,6 @@ void TextEditor::loadFromFileDecrypted(const std::string &fileName, Cipher *ciph
     std::string fileContent = buffer.str();
 
     std::string decrypted = cipher -> decrypt(fileContent);
-
     inFile.close();
-
     deserializeAll(decrypted);
 }
