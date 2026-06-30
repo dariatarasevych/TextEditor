@@ -28,6 +28,8 @@ void TextEditor::clearLines() {
 
 //Add new object (TextLine, ChecklistLine or ContactLine)
 void TextEditor::appendLine(Line *newLine) {
+    saveSnapshot();
+
     line_counter++;
 
     Line** temp_lines = (Line**) realloc(lines, (line_counter) * sizeof(Line*));
@@ -54,6 +56,8 @@ void TextEditor::printAll() const {
 }
 
 void TextEditor::appendTextToLastLine(const std::string &text) {
+    saveSnapshot();
+
     if (line_counter == 0) {
         std::cout << "Text is empty." << std::endl;
         return;
@@ -97,6 +101,8 @@ void TextEditor::searchInText(const std::string &inputToSearch) const {
 }
 
 void TextEditor::insertText(int lineIndex, int charIndex, const std::string &text) {
+    saveSnapshot();
+
     if (lineIndex < 0 || lineIndex >= line_counter) {
         std::cout << "Invalid line index." << std::endl;
         return;
@@ -124,6 +130,8 @@ void TextEditor::insertText(int lineIndex, int charIndex, const std::string &tex
 }
 
 void TextEditor::insertWithReplacement(int lineIndex, int charIndex, const std::string &text) {
+    saveSnapshot();
+
     if (lineIndex < 0 || lineIndex >= line_counter) {
         std::cout << "Invalid line index." << std::endl;
         return;
@@ -158,6 +166,8 @@ void TextEditor::insertWithReplacement(int lineIndex, int charIndex, const std::
 }
 
 void TextEditor::deleteText(int lineIndex, int charIndex, int count) {
+    saveSnapshot();
+
     if (lineIndex < 0 || lineIndex >= line_counter) {
         std::cout << "Invalid line index." << std::endl;
         return;
