@@ -6,7 +6,7 @@
 CLI::CLI(TextEditor &text_editor) : editor(text_editor) {}
 
 void CLI::printMenu() const {
-    std::cout << "\n================= TEXT EDITOR MENU =================\n";
+    std::cout << "\n------------------ TEXT EDITOR MENU ------------------\n";
     std::cout << "1 - Print all lines (printAll)\n";
     std::cout << "2 - Append new line (appendLine)\n";
     std::cout << "3 - Append text to the last line (appendTextToLastLine)\n";
@@ -24,7 +24,7 @@ void CLI::printMenu() const {
     std::cout << "15 - Save to file (Encrypted text)\n";
     std::cout << "16 - Load from file (Decrypted text)\n";
     std::cout << "0 - Exit\n";
-    std::cout << "========================================================\n";
+    std::cout << "--------------------------------------------------------\n";
     std::cout << "Enter your choice: ";
 }
 
