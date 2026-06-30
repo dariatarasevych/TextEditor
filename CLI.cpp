@@ -33,6 +33,274 @@ void CLI::Run() {
     while (true) {
         printMenu();
         std::cin >> choice;
+
+        switch (choice) {
+            case 1: {
+                std::cout << "Current text: \n" << std::endl;
+                editor.printAll();
+                break;
+            }
+
+            case 2: {
+                std::cout << "Enter line type (1 - Text Line, 2 - Check List Line, 3 - Contact Line): ";
+                int type;
+                std::cin >> type;
+                std::cin.ignore();
+
+                if (type == 1) {
+                    std::cout << "Enter text: ";
+                    std::string text;
+                    std::cin >> text;
+                    std::getline(std::cin, text);
+
+                    editor.appendLine(new TextLine(text));
+
+                    std::cout << "Text Line added.\n";
+                }
+
+                else if (type == 2) {
+                    std::cout << "Enter text: ";
+                    std::string text;
+                    std::cin >> text;
+                    std::getline(std::cin, text);
+
+                    std::cout << "Is it checked? (1 - yes, 0 - no): ";
+                    bool is_checked;
+                    std::cin >> is_checked;
+
+                    editor.appendLine(new CheckListLine(text, is_checked));
+
+                    std::cout << "Check List Line added.\n";
+                }
+
+                else if (type == 3) {
+                    std::string firstName, lastName, email;
+                    std::cout << "Enter First Name: ";
+                    std::getline(std::cin, firstName);
+                    std::cout << "Enter Last Name: ";
+                    std::getline(std::cin, lastName);
+                    std::cout << "Enter email: ";
+                    std::getline(std::cin, email);
+
+                    editor.appendLine(new ContactLine(firstName, lastName, email));
+
+                    std::cout << "Contact Line added.\n";
+                }
+                break;
+            }
+
+            case 3: {
+                std::cin.ignore();
+                std::cout << "Enter text to append to the last line: ";
+                std::string text;
+                std::cin >> text;
+                std::getline(std::cin, text);
+
+                editor.appendTextToLastLine(text);
+
+                std::cout << "Text added to the last line.\n";
+
+                break;
+            }
+
+            case 4: {
+                int lineIndex, charIndex;
+                std::string text;
+                std::cout << "Enter line index to insert text: ";
+                std::cin >> lineIndex;
+                std::cout << "Enter char index: ";
+                std::cin >> charIndex;
+                std::cin.ignore();
+                std::cout << "Enter text to insert: ";
+                std::getline(std::cin, text);
+
+                editor.insertText(lineIndex, charIndex, text);
+
+                std::cout << "Inserted.\n";
+                break;
+            }
+
+            case 5: {
+                int lineIndex, charIndex;
+                std::string text;
+                std::cout << "Enter line index to insert text: ";
+                std::cin >> lineIndex;
+                std::cout << "Enter char index: ";
+                std::cin >> charIndex;
+                std::cin.ignore();
+                std::cout << "Enter text to replace: ";
+                std::getline(std::cin, text);
+
+                editor.insertWithReplacement(lineIndex, charIndex, text);
+                std::cout << "Replaced.\n";
+                break;
+            }
+
+            case 6: {
+                int lineIndex, charIndex, count;
+                std::cout << "Enter line index to delete text: ";
+                std::cin >> lineIndex;
+                std::cout << "Enter char index: ";
+                std::cin >> charIndex;
+                std::cout << "Enter number of symbols to delete: ";
+                std::cin >> count;
+
+                editor.deleteText(lineIndex, charIndex, count);
+                std::cout << "Deleted.\n";
+                break;
+            }
+
+            case 7: {
+                int lineIndex, charIndex, count;
+                std::cout << "Enter line index to copy text: ";
+                std::cin >> lineIndex;
+                std::cout << "Enter char index: ";
+                std::cin >> charIndex;
+                std::cout << "Enter number of symbols to copy: ";
+                std::cin >> count;
+
+                editor.copyText(lineIndex, charIndex, count);
+                break;
+            }
+
+            case 8: {
+                int lineIndex, charIndex, count;
+                std::cout << "Enter line index to cut text: ";
+                std::cin >> lineIndex;
+                std::cout << "Enter char index: ";
+                std::cin >> charIndex;
+                std::cout << "Enter number of symbols to cut: ";
+                std::cin >> count;
+
+                editor.cutText(lineIndex, charIndex, count);
+                break;
+            }
+
+            case 9: {
+                int lineIndex, charIndex;
+                std::cout << "Enter line index to cut text: ";
+                std::cin >> lineIndex;
+                std::cout << "Enter char index: ";
+                std::cin >> charIndex;
+
+                editor.pasteText(lineIndex, charIndex);
+                break;
+            }
+
+            case 10: {
+                std::cin.ignore();
+                std::cout << "Enter text to search: ";
+                std::string text;
+                std::getline(std::cin, text);
+
+                editor.searchInText(text);
+                break;
+            }
+
+            case 11: {
+                editor.undo();
+                break;
+            }
+
+            case 12: {
+                editor.redo();
+                break;
+            }
+
+            case 13: {
+                std::cin.ignore();
+                std::string fileName;
+                std::cout << "Enter file name to save to: ";
+                std::getline(std::cin, fileName);
+
+                editor.saveToFile(fileName);
+                break;
+            }
+
+            case 14: {
+                std::cin.ignore();
+                std::string fileName;
+                std::cout << "Enter file name to load from: ";
+                std::getline(std::cin, fileName);
+
+                editor.loadFromFile(fileName);
+                break;
+            }
+
+            case 15: {
+                std::cin.ignore();
+                std::string fileName;
+                std::cout << "Enter file name to save (encrypted): ";
+                std::getline(std::cin, fileName);
+
+                std::cout << "Enter cipher type (1 - Caesar, 2 - Vigenere): ";
+                int type;
+                std::cin >> type;
+
+                Cipher* cipher = nullptr;
+
+                if (type == 1) {
+                    int key;
+                    std::cout << "Enter Caesar key: ";
+                    std::cin >> key;
+                    cipher = new CaesarCipher(key);
+                }
+                else if (type == 2) {
+                    std::string key;
+                    std::cout << "Enter Vigenere key word: ";
+                    std::getline(std::cin, key);
+
+                    cipher = new VigenereCipher(key);
+                }
+
+                if (cipher != nullptr) {
+                    editor.saveToFileEncrypted(fileName, cipher);
+                    delete cipher;
+                    std::cout << "File was saved and encrypted.\n";
+                }else {
+                    std::cout << "Invalid selection of cipher type.\n";
+                }
+                break;
+            }
+
+            case 16: {
+                std::cin.ignore();
+                std::string fileName;
+                std::cout << "Enter file name to load (decrypted): ";
+                std::getline(std::cin, fileName);
+
+                std::cout << "Enter cipher type (1 - Caesar, 2 - Vigenere): ";
+                int type;
+                std::cin >> type;
+
+                Cipher* cipher = nullptr;
+
+                if (type == 1) {
+                    int key;
+                    std::cout << "Enter Caesar key: ";
+                    std::cin >> key;
+                    cipher = new CaesarCipher(key);
+                }
+
+                else if (type == 2) {
+                    std::string key;
+                    std::cout << "Enter Vigenere key word: ";
+                    std::getline(std::cin, key);
+
+                    cipher = new VigenereCipher(key);
+                }
+
+                if (cipher != nullptr) {
+                    editor.loadFromFileDecrypted(fileName, cipher);
+                    delete cipher;
+
+                    std::cout << "File was loaded and decrypted.\n";
+                }else {
+                    std::cout <<"Invalid selection of cipher type.\n";
+                }
+                break;
+            }
+        }
     }
 }
 
