@@ -175,7 +175,7 @@ void CLI::Run() {
 
             case 9: {
                 int lineIndex, charIndex;
-                std::cout << "Enter line index to cut text: ";
+                std::cout << "Enter line index to paste text: ";
                 std::cin >> lineIndex;
                 std::cout << "Enter char index: ";
                 std::cin >> charIndex;
