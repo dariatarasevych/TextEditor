@@ -12,3 +12,9 @@ add_executable(assignment_4 main.cpp
         CLI.cpp
         CLI.h
 )
+
+add_library(cipher SHARED
+        cipher_lib/cipher_api.h
+        cipher_lib/cipher_private.h
+        cipher_lib/cipher.cpp
+)
