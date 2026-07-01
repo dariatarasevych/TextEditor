@@ -13,7 +13,7 @@ private:
     typedef void* cipher_t;
 
     typedef cipher_t* (*CreateCaesarFunc)(int);
-    typedef cipher_t* (CreateVigenereFunc)(const char*);
+    typedef cipher_t* (*CreateVigenereFunc)(const char*);
     typedef char* (*EncryptFunc)(cipher_t*, const char*);
     typedef char* (*DecryptFunc)(cipher_t*, const char*);
     typedef void (*DestroyFunc)(cipher_t*);

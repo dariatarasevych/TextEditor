@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <limits>
+#include "Cipher.h"
 
 CLI::CLI(TextEditor &text_editor) : editor(text_editor) {}
 
@@ -239,14 +240,17 @@ void CLI::Run() {
                     int key;
                     std::cout << "Enter Caesar key: ";
                     std::cin >> key;
-                    cipher = new CaesarCipher(key);
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+                    Cipher cipher(1, key, "");
                 }
                 else if (type == 2) {
                     std::string key;
                     std::cout << "Enter Vigenere key word: ";
                     std::getline(std::cin, key);
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-                    cipher = new VigenereCipher(key);
+                    Cipher cipher(2, 0, key);
                 }
 
                 if (cipher != nullptr) {
@@ -260,7 +264,7 @@ void CLI::Run() {
             }
 
             case 16: {
-                std::cin.ignore();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 std::string fileName;
                 std::cout << "Enter file name to load (decrypted): ";
                 std::getline(std::cin, fileName);
@@ -275,15 +279,18 @@ void CLI::Run() {
                     int key;
                     std::cout << "Enter Caesar key: ";
                     std::cin >> key;
-                    cipher = new CaesarCipher(key);
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+                    cipher = new Cipher(1, key, "");
                 }
 
                 else if (type == 2) {
                     std::string key;
                     std::cout << "Enter Vigenere key word: ";
                     std::getline(std::cin, key);
-
-                    cipher = new VigenereCipher(key);
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    
+                    cipher = new Cipher(2, 0, key);
                 }
 
                 if (cipher != nullptr) {
